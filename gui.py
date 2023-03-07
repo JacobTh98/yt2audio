@@ -1,6 +1,9 @@
-from src import read_conv_conf, overwrite_conv_conf
+from src import read_conv_conf, overwrite_conv_conf, get_title_from_url, update_ydl_opts
+import os
+from youtube_dl import YoutubeDL
 
 from tkinter import (
+    StringVar,
     END,
     ttk,
     Button,
@@ -29,14 +32,18 @@ class ConvConf:
     s_path: str
 
 
+conv_conf = ConvConf(**read_conv_conf())
+ydl_opts = update_ydl_opts(conv_conf.priority_format)
+
+print(f"{ydl_opts=}")
+
+audio_downloader = YoutubeDL(ydl_opts)
 """ Read write dataclasses """
 
-conv_conf = ConvConf(**read_conv_conf())
-
-if conv_conf.priority_format == "mp3":
-    prior_format = [".wav", ".mp3"]
+if conv_conf.priority_format == "wav":
+    prior_format = ["wav", "mp3"]
 else:
-    prior_format = [".mp3", ".wav"]
+    prior_format = ["mp3", "wav"]
 
 """ Constant design/layout values"""
 spacer = 20
@@ -67,10 +74,10 @@ class GlobalSettings:
             x=spacer, y=spacer, height=btn_height, width=6 * btn_width
         )
 
-        self.tnk_dropdown = ttk.Combobox(values=prior_format)
-        self.tnk_dropdown.current(0)
-        self.tnk_dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
-        self.tnk_dropdown.place(
+        self.format_dropdown = ttk.Combobox(values=prior_format)
+        self.format_dropdown.current(0)
+        self.format_dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
+        self.format_dropdown.place(
             x=6 * btn_width + 2 * spacer,
             y=spacer,
             width=2 * btn_width,
@@ -78,7 +85,12 @@ class GlobalSettings:
         )
 
     def dropdown_callback(self, event=None):
-        pass
+        global audio_downloader
+        if event:
+            conv_conf.priority_format = self.format_dropdown.get()
+            ydl_opts = update_ydl_opts(conv_conf.priority_format)
+            audio_downloader = YoutubeDL(ydl_opts)
+            print(f"Changes\n{conv_conf=}\n{ydl_opts=}")
 
 
 class Labels:
@@ -90,14 +102,24 @@ class Labels:
             app, text="Youtube link:", bg="#2A3240", fg="#DF7356", anchor="e"
         )
         self.yt_link_paste.place(
-            x=spacer, y=2 * spacer + btn_height, height=btn_height, width=4 * btn_width
+            x=0, y=2 * spacer + btn_height, height=btn_height, width=4 * btn_width
         )
         self.name_paste = Label(
             app, text="Song name:", bg="#2A3240", fg="#DF7356", anchor="e"
         )
         self.name_paste.place(
-            x=spacer,
+            x=0,
             y=3 * spacer + 2 * btn_height,
+            height=btn_height,
+            width=4 * btn_width,
+        )
+
+        self.export_name = Label(
+            app, text="Export name:", bg="#2A3240", fg="#DF7356", anchor="e"
+        )
+        self.export_name.place(
+            x=0,
+            y=4 * spacer + 3 * btn_height,
             height=btn_height,
             width=4 * btn_width,
         )
@@ -107,24 +129,24 @@ class InputFieldsButtons:
     def __init__(self, app) -> None:
         self.entry_yt_link = Entry(app)
         self.entry_yt_link.place(
-            x=2 * spacer + 4 * btn_width,
+            x=spacer + 4 * btn_width,
             y=2 * spacer + btn_height,
             height=btn_height,
-            width=11 * btn_width,
+            width=11 * btn_width + spacer,
         )
 
         self.entry_song_name = Entry(app)
         self.entry_song_name.place(
-            x=2 * spacer + 4 * btn_width,
+            x=spacer + 4 * btn_width,
             y=3 * spacer + 2 * btn_height,
             height=btn_height,
-            width=11 * btn_width,
+            width=11 * btn_width + spacer,
         )
 
         self.run_yt_link = Button(
             app,
-            text="Convert",
-            command=self.show_entry_fields,
+            text="Apply",
+            command=self.apply_yt_link,
             bg="#425A7D",
             fg="#DF7356",
         )
@@ -136,8 +158,8 @@ class InputFieldsButtons:
         )
         self.run_yt_name = Button(
             app,
-            text="Convert",
-            command=self.show_entry_fields,
+            text="Apply",
+            command=self.apply_yt_name,
             bg="#425A7D",
             fg="#DF7356",
         )
@@ -147,6 +169,53 @@ class InputFieldsButtons:
             height=btn_height,
             width=3 * btn_width,
         )
+        self.entry_text = StringVar()
+        self.export_name = Entry(app, textvariable=self.entry_text)
+        self.export_name.place(
+            x=spacer + 4 * btn_width,
+            y=4 * spacer + 3 * btn_height,
+            height=btn_height,
+            width=11 * btn_width + spacer,
+        )
+
+        self.start_convert = Button(
+            app,
+            text="Convert",
+            state="disabled",
+            command=self.convert,
+            bg="#425A7D",
+            fg="#DF7356",
+        )
+        self.start_convert.place(
+            x=2 * spacer + 15 * btn_width + spacer,
+            y=4 * spacer + 3 * btn_height,
+            height=btn_height,
+            width=3 * btn_width,
+        )
+
+    def apply_yt_name(self):
+        self.start_convert["state"] = "normal"
+        print("TBD")
+
+    def apply_yt_link(self):
+        self.entry_text.set(get_title_from_url(self.entry_yt_link.get()))
+        self.start_convert["state"] = "normal"
+
+    def convert(self):
+        print("converting...")
+        self.start_convert["state"] = "disabled"
+
+        info = audio_downloader.extract_info(self.entry_yt_link.get())
+
+        os.rename(
+            src=info["title"] + "-" + info["id"] + "." + conv_conf.priority_format,
+            dst=conv_conf.s_path + self.export_name.get(),
+        )
+        print("\tFinished.")
+
+        self.entry_yt_link.delete(0, END)
+        self.entry_song_name.delete(0, END)
+        self.export_name.delete(0, END)
 
     def show_entry_fields(self):
         print(
