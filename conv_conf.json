@@ -1,1 +1,4 @@
-{"priority_format": "mp3", "s_path": "/home/magnus/Schreibtisch/"}
+{
+    "priority_format": "wav",
+    "s_path": "./downloads/"
+}
