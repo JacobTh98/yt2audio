@@ -1,9 +1,11 @@
 from src import read_conv_conf, overwrite_conv_conf, get_title_from_url, update_ydl_opts
 import os
 from youtube_dl import YoutubeDL
+from youtubesearchpython import VideosSearch
 
 from tkinter import (
     StringVar,
+    IntVar,
     END,
     ttk,
     Button,
@@ -124,10 +126,21 @@ class Labels:
             width=4 * btn_width,
         )
 
+        self.dwnlds_count = Label(
+            app, text="Downloads:", bg="#2A3240", fg="#DF7356", anchor="e"
+        )
+        self.dwnlds_count.place(
+            x=0,
+            y=5 * spacer + 4 * btn_height,
+            height=btn_height,
+            width=4 * btn_width,
+        )
+
 
 class InputFieldsButtons:
     def __init__(self, app) -> None:
-        self.entry_yt_link = Entry(app)
+        self.entry_link = StringVar()
+        self.entry_yt_link = Entry(app, textvariable=self.entry_link)
         self.entry_yt_link.place(
             x=spacer + 4 * btn_width,
             y=2 * spacer + btn_height,
@@ -192,19 +205,32 @@ class InputFieldsButtons:
             height=btn_height,
             width=3 * btn_width,
         )
-
-    def apply_yt_name(self):
-        self.start_convert["state"] = "normal"
-        print("TBD")
+        self.dwnld_count = IntVar()
+        self.dwnld_count.set(len(os.listdir(conv_conf.s_path)))
+        self.count = Label(
+            app, textvariable=self.dwnld_count, bg="#2A3240", fg="#DF7356", anchor="w"
+        )
+        self.count.place(
+            x=4 * btn_width + spacer,
+            y=5 * spacer + 4 * btn_height,
+            height=btn_height,
+            width=2 * btn_width,
+        )
 
     def apply_yt_link(self):
         self.entry_text.set(get_title_from_url(self.entry_yt_link.get()))
         self.start_convert["state"] = "normal"
 
+    def apply_yt_name(self):
+        videosSearch = VideosSearch(self.entry_song_name.get(), limit=1)
+        link = videosSearch.result()["result"][0]["link"]
+        self.entry_link.set(link)
+        self.entry_text.set(get_title_from_url(link))
+        self.start_convert["state"] = "normal"
+
     def convert(self):
         print("converting...")
         self.start_convert["state"] = "disabled"
-
         info = audio_downloader.extract_info(self.entry_yt_link.get())
 
         os.rename(
@@ -216,14 +242,7 @@ class InputFieldsButtons:
         self.entry_yt_link.delete(0, END)
         self.entry_song_name.delete(0, END)
         self.export_name.delete(0, END)
-
-    def show_entry_fields(self):
-        print(
-            "YT-link: %s\nYT-name: %s"
-            % (self.entry_song_name.get(), self.entry_yt_link.get())
-        )
-        self.entry_yt_link.delete(0, END)
-        self.entry_song_name.delete(0, END)
+        self.dwnld_count.set(len(os.listdir(conv_conf.s_path)))
 
 
 """Main Init"""
@@ -245,5 +264,5 @@ dropdown.add_cascade(label="File", menu=datei_menu)
 
 
 app.config(menu=dropdown)
-app.geometry("1000x400")
+app.geometry("1000x370")
 app.mainloop()
