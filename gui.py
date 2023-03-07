@@ -3,6 +3,11 @@ import os
 from youtube_dl import YoutubeDL
 from youtubesearchpython import VideosSearch
 
+try:
+    os.mkdir("downloads")
+except BaseException:
+    print("Directory already exist.")
+
 from tkinter import (
     StringVar,
     IntVar,
