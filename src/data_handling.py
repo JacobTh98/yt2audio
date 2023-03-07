@@ -54,7 +54,7 @@ def remove_word(title: str) -> str:
     return title
 
 
-def get_title_from_url(url: str, substitute_str:bool=True) -> str:
+def get_title_from_url(url: str, substitute_str: bool = True) -> str:
     """
     Extract the video title from a YouTube url.
 
