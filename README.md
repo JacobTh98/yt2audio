@@ -29,7 +29,7 @@ and run the repair script:
 
     bash repair_script.sh
 
-You need a ffmpeg player:
+Furthermore, you need a ffmpeg player:
 
     https://stackoverflow.com/questions/30770155/ffprobe-or-avprobe-not-found-please-install-one
 
