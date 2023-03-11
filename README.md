@@ -29,4 +29,8 @@ and run the repair script:
 
     bash repair_script.sh
 
-or create an issue at GitHub.
+Furthermore, you need a ffmpeg player:
+
+    https://stackoverflow.com/questions/30770155/ffprobe-or-avprobe-not-found-please-install-one
+
+Create an issue at GitHub.

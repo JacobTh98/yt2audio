@@ -240,7 +240,10 @@ class InputFieldsButtons:
 
         os.rename(
             src=info["title"] + "-" + info["id"] + "." + conv_conf.priority_format,
-            dst=conv_conf.s_path + self.export_name.get(),
+            dst=conv_conf.s_path
+            + self.export_name.get()
+            + "."
+            + conv_conf.priority_format,
         )
         print("\tFinished.")
 
