@@ -18,6 +18,7 @@ HQ
 HD
 4K
 Mix
+amp;
 ; -
 ()
 []
