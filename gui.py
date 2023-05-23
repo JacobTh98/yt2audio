@@ -88,9 +88,7 @@ class GlobalSettings:
 
         self.format_dropdown = ttk.Combobox(values=prior_format)
         self.format_dropdown.current(0)
-        self.format_dropdown.bind(
-            "<<ComboboxSelected>>", self.dropdown_callback
-        )
+        self.format_dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
         self.format_dropdown.place(
             x=6 * btn_width + 2 * spacer,
             y=spacer,
@@ -110,9 +108,7 @@ class GlobalSettings:
 class Labels:
     def __init__(self, app) -> None:
         self.defaultFont = font.nametofont("TkDefaultFont")
-        self.defaultFont.configure(
-            family="Segoe Script", size=15, weight=font.BOLD
-        )
+        self.defaultFont.configure(family="Segoe Script", size=15, weight=font.BOLD)
 
         self.yt_link_paste = Label(
             app, text="Youtube link:", bg="#2A3240", fg="#DF7356", anchor="e"
@@ -255,11 +251,7 @@ class InputFieldsButtons:
         info = audio_downloader.extract_info(self.entry_yt_link.get())
 
         os.rename(
-            src=info["title"]
-            + "-"
-            + info["id"]
-            + "."
-            + conv_conf.priority_format,
+            src=info["title"] + "-" + info["id"] + "." + conv_conf.priority_format,
             dst=conv_conf.s_path
             + self.export_name.get().rstrip()
             + "."
