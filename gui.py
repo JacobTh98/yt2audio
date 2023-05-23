@@ -1,4 +1,9 @@
-from src import read_conv_conf, overwrite_conv_conf, get_title_from_url, update_ydl_opts
+from src import (
+    read_conv_conf,
+    overwrite_conv_conf,
+    get_title_from_url,
+    update_ydl_opts,
+)
 import os
 from youtube_dl import YoutubeDL
 from youtubesearchpython import VideosSearch
@@ -83,7 +88,9 @@ class GlobalSettings:
 
         self.format_dropdown = ttk.Combobox(values=prior_format)
         self.format_dropdown.current(0)
-        self.format_dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
+        self.format_dropdown.bind(
+            "<<ComboboxSelected>>", self.dropdown_callback
+        )
         self.format_dropdown.place(
             x=6 * btn_width + 2 * spacer,
             y=spacer,
@@ -103,13 +110,18 @@ class GlobalSettings:
 class Labels:
     def __init__(self, app) -> None:
         self.defaultFont = font.nametofont("TkDefaultFont")
-        self.defaultFont.configure(family="Segoe Script", size=15, weight=font.BOLD)
+        self.defaultFont.configure(
+            family="Segoe Script", size=15, weight=font.BOLD
+        )
 
         self.yt_link_paste = Label(
             app, text="Youtube link:", bg="#2A3240", fg="#DF7356", anchor="e"
         )
         self.yt_link_paste.place(
-            x=0, y=2 * spacer + btn_height, height=btn_height, width=4 * btn_width
+            x=0,
+            y=2 * spacer + btn_height,
+            height=btn_height,
+            width=4 * btn_width,
         )
         self.name_paste = Label(
             app, text="Song name:", bg="#2A3240", fg="#DF7356", anchor="e"
@@ -213,7 +225,11 @@ class InputFieldsButtons:
         self.dwnld_count = IntVar()
         self.dwnld_count.set(len(os.listdir(conv_conf.s_path)))
         self.count = Label(
-            app, textvariable=self.dwnld_count, bg="#2A3240", fg="#DF7356", anchor="w"
+            app,
+            textvariable=self.dwnld_count,
+            bg="#2A3240",
+            fg="#DF7356",
+            anchor="w",
         )
         self.count.place(
             x=4 * btn_width + spacer,
@@ -230,7 +246,7 @@ class InputFieldsButtons:
         videosSearch = VideosSearch(self.entry_song_name.get(), limit=1)
         link = videosSearch.result()["result"][0]["link"]
         self.entry_link.set(link)
-        self.entry_text.set(get_title_from_url(link))
+        self.entry_text.set(get_title_from_url(link).rstrip())
         self.start_convert["state"] = "normal"
 
     def convert(self):
@@ -239,9 +255,13 @@ class InputFieldsButtons:
         info = audio_downloader.extract_info(self.entry_yt_link.get())
 
         os.rename(
-            src=info["title"] + "-" + info["id"] + "." + conv_conf.priority_format,
+            src=info["title"]
+            + "-"
+            + info["id"]
+            + "."
+            + conv_conf.priority_format,
             dst=conv_conf.s_path
-            + self.export_name.get()
+            + self.export_name.get().rstrip()
             + "."
             + conv_conf.priority_format,
         )
