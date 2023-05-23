@@ -6,7 +6,7 @@ Clone this repository and navigate to the corresponding directory. Inside this f
 
     python gui.py
 
-Or
+or
 
     python3 gui.py
 
@@ -19,7 +19,7 @@ To install the dependencies, type:
 
     pip install -r requirements.txt
 
-## Download doesn´t work
+## Error Handlink
 
 Update the repository:
 
@@ -34,8 +34,6 @@ Furthermore, you need a ffmpeg player:
     https://stackoverflow.com/questions/30770155/ffprobe-or-avprobe-not-found-please-install-one
 
 Create an issue at GitHub.
-
-## Different Errors
 
 ### Error log: `ModuleNotFoundError: No module named 'tkinter'`
 
